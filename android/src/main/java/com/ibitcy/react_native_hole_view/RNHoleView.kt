@@ -85,23 +85,8 @@ class RNHoleView(context: Context) : ReactViewGroup(context) {
         return true
     }
 
-    private fun isTouchInsideHole( touchX:Int, touchY:Int): Boolean {
-        if (mHolesPath == null)
-            return false
-        val clickableRegion = Region()
-        val rectF = RectF()
-        mHolesPath!!.computeBounds(rectF, true)
-        val rect = Rect(rectF.left.toInt(), rectF.top.toInt(), rectF.right.toInt(), rectF.bottom.toInt())
-        clickableRegion.setPath(mHolesPath!!, Region(rect))
-        return clickableRegion.contains(touchX, touchY)
-    }
-
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val inside = isTouchInsideHole(event.x.toInt(), event.y.toInt())
-        if (inside) {
-            return false
-        }
-        return !inside
+        return false
     }
 
 //    We'll need it in case Facebook will accept our PR https://github.com/facebook/react-native/issues/28953
@@ -117,15 +102,12 @@ class RNHoleView(context: Context) : ReactViewGroup(context) {
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         super.onInterceptTouchEvent(ev)
-        return isTouchInsideHole(ev.x.toInt(), ev.y.toInt())
+        return true
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        val inside = isTouchInsideHole(ev.x.toInt(), ev.y.toInt())
-        if (inside) {
-            passTouchEventToViewAndChildren(getRoot(), ev)
-        }
-        return !inside
+        passTouchEventToViewAndChildren(getRoot(), ev)
+        return false
     }
 
     private fun getRoot(): ViewGroup {
